@@ -1,3 +1,4 @@
+import pandas as pd
 from SimplePythonSunPositionCalculator import getSEA
 
 deg_4_dates = []
@@ -6,16 +7,16 @@ deg_4_ele = []
 deg_0_96_ele = []
 for mth in range(1, 13):
     end_day = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-    for dy in range(1, end_day[mth-1]):
+    for dy in range(1, end_day[mth - 1] + 1):
         is_sunset = False
         is_less_than_4 = False
         for hr in range(1, 10):
             if is_sunset and is_less_than_4:
                 break
-            ele, date = getSEA(25.414084, 49.723500, 3, 2020, mth, dy, hr + 12, 0)
+            ele, date = getSEA(25.414084, 49.723500, 3, 2021, mth, dy, hr + 12, 0)
             i = 0
             for mn in range(0, 60):
-                ele, date = getSEA(25.414084, 49.723500, 3, 2020, mth, dy, hr + 12, mn)
+                ele, date = getSEA(25.414084, 49.723500, 3, 2021, mth, dy, hr + 12, mn)
                 if (ele < -.96) and not is_sunset:
                     is_sunset = True
                     deg_0_96_dates.append(date)
@@ -28,6 +29,17 @@ for mth in range(1, 13):
 
                 if is_sunset and is_less_than_4:
                     break
+
+deg_0_96_dates_df = pd.DataFrame({'year': [deg_0_96_dates[i].year for i in range(0, len(deg_0_96_dates))],
+                                  'month': [deg_0_96_dates[i].month for i in range(0, len(deg_0_96_dates))],
+                                  'day': [deg_0_96_dates[i].day for i in range(0, len(deg_0_96_dates))],
+                                  'hour': [deg_0_96_dates[i].hour for i in range(0, len(deg_0_96_dates))],
+                                  'minute': [deg_0_96_dates[i].minute for i in range(0, len(deg_0_96_dates))]})
+deg_4_dates_df = pd.DataFrame({'year': [deg_4_dates[i].year for i in range(0, len(deg_4_dates))],
+                               'month': [deg_4_dates[i].month for i in range(0, len(deg_4_dates))],
+                               'day': [deg_4_dates[i].day for i in range(0, len(deg_4_dates))],
+                               'hour': [deg_4_dates[i].hour for i in range(0, len(deg_4_dates))],
+                               'minute': [deg_4_dates[i].minute for i in range(0, len(deg_4_dates))]})
 
 diff_minutes = [(deg_4_dates[i] - deg_0_96_dates[i]).total_seconds() / 60 for i in range(0, len(deg_0_96_dates))]
 diff_deg_4_ele = [abs(4 - abs(deg_4_ele[i])) for i in range(0, len(deg_4_ele))]
